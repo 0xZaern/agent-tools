@@ -1,0 +1,52 @@
+{
+  "name": "diffdigest",
+  "version": "1.0.0",
+  "description": "Token-efficient git diff and GitHub PR digest for AI agents — compresses a raw unified diff into a structured change summary with per-file hunks, net lines, changed symbols, and risk signals at a fraction of raw diff token cost",
+  "private": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "bin": {
+    "diffdigest": "dist/cli.js"
+  },
+  "files": [
+    "dist/lib",
+    "dist/cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.lib.json",
+    "typecheck": "tsc -p tsconfig.lib.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "llm",
+    "mcp",
+    "git",
+    "diff",
+    "pull-request",
+    "code-review",
+    "context",
+    "developer-tools"
+  ],
+  "dependencies": {
+    "parse-diff": "^0.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.3"
+  }
+}
