@@ -2,16 +2,24 @@
 
 An MCP (Model Context Protocol) server that exposes the [agent-skills](../../README.md) collection as native tools for MCP-compatible editors and AI workflows.
 
-Connect it once, and any MCP-compatible client gets direct access to `repo_digest` and `codemap` — no extra scripts, no shell commands.
+Connect it once, and any MCP-compatible client gets direct access to all ten agent-skills tools — no extra scripts, no shell commands.
 
 ---
 
 ## Available tools
 
-| Tool | Description |
-|------|-------------|
-| `repo_digest` | Produce a token-efficient digest of a GitHub repository (metadata, file tree, key files, language breakdown, recent commits). |
-| `codemap` | Produce a token-efficient map of a local codebase — exported symbols with one-line signatures, pruned file tree, import graph. |
+| Tool | Underlying skill | Description |
+|------|-----------------|-------------|
+| `repo_digest` | devpulse | Token-efficient digest of a GitHub repository (metadata, file tree, key files, language breakdown, recent commits). |
+| `codemap` | codemap | Token-efficient map of a local codebase — exported symbols with one-line signatures, pruned file tree, import graph. |
+| `apiscout` | apiscout | Token-efficient OpenAPI/Swagger spec digest — endpoint summaries by tag, auth schemes, schema field lists. |
+| `auditsnap` | auditsnap | Token-efficient npm audit digest — vulnerabilities ranked by severity with fix-available flags. |
+| `schemadiff` | schemadiff | Token-efficient DB schema digest (Prisma, SQL DDL, Drizzle) — ERD-style entities, relations, indexes. |
+| `logfold` | logfold | Token-efficient error log digest — deduplicates, folds stack noise, groups by error signature. |
+| `diffdigest` | diffdigest | Token-efficient git diff / GitHub PR digest — per-file change summary and risk signals. |
+| `depgraph` | depgraph | Token-efficient import/export graph — entry points, circular deps, heaviest subtrees. |
+| `releasemap` | releasemap | Token-efficient changelog digest — version timeline with breaking-change flags and drill-down. |
+| `testgen` | testgen | Edge-case test skeleton generator — null, undefined, empty, boundary, type-mismatch stubs for vitest or jest. |
 
 ---
 
@@ -51,7 +59,7 @@ Add this to your MCP client's config (works with any MCP-compatible editor or wo
 
 Replace `/absolute/path/to/agent-skills` with the actual path where you cloned the repo.
 
-After restarting your client, the `repo_digest` and `codemap` tools will be available natively.
+After restarting your client, all ten tools listed above will be available natively.
 
 ---
 
