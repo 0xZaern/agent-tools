@@ -180,6 +180,11 @@ export async function getReleaseMap(
     releases = releases.filter((r) => semverGte(r.version, opts.since!));
   }
 
+  // Apply --limit
+  if (opts.limit && opts.limit > 0) {
+    releases = releases.slice(0, opts.limit);
+  }
+
   // Apply --version drill-down (keep body, filter to single release)
   if (opts.version) {
     const vclean = opts.version.replace(/^v/, "");

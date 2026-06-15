@@ -15,6 +15,8 @@ export interface ReleaseMapOptions {
   version?: string;
   /** GitHub personal access token for higher rate limits */
   token?: string;
+  /** Maximum number of releases to return (default: all) */
+  limit?: number;
 }
 
 // ---------------------------------------------------------------------------

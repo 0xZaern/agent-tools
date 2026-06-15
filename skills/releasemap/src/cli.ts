@@ -42,6 +42,7 @@ OPTIONS
   --stats           Print only the token-savings summary line
   --since v1.2.0    Show only releases at or after this version
   --version v2.0.0  Drill into a single version (returns full release notes)
+  --limit N         Return only the N most recent releases
   --max-tokens N    Trim the digest to approximately N tokens
   --token ghp_...   GitHub personal access token (for higher rate limits)
   -h, --help        Show this help message
@@ -67,6 +68,7 @@ async function main(): Promise<void> {
       stats: { type: "boolean" },
       since: { type: "string" },
       version: { type: "string" },
+      limit: { type: "string" },
       "max-tokens": { type: "string" },
       token: { type: "string" },
       help: { type: "boolean", short: "h" },
@@ -118,8 +120,16 @@ async function main(): Promise<void> {
     typeof values["token"] === "string"
       ? values["token"]
       : process.env["GITHUB_TOKEN"];
+  const limitRaw = typeof values["limit"] === "string" ? values["limit"] : undefined;
+  const limit = limitRaw ? parseInt(limitRaw, 10) : undefined;
+  if (limitRaw && (isNaN(limit!) || limit! <= 0)) {
+    process.stderr.write(
+      `Error: --limit must be a positive integer, got "${limitRaw}"\n`
+    );
+    process.exit(1);
+  }
 
-  const opts: ReleaseMapOptions = { format, maxTokens, since, version: versionDrill, token };
+  const opts: ReleaseMapOptions = { format, maxTokens, since, version: versionDrill, token, limit };
 
   try {
     process.stderr.write(`Loading releases from ${target}...\n`);
