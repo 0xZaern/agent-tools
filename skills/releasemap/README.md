@@ -158,6 +158,23 @@ interface ReleaseEntry {
 
 ---
 
+## Example fixtures
+
+The [`examples/`](./examples/) directory contains a ready-made input fixture you can use to try the CLI without needing a live CHANGELOG or internet access:
+
+```sh
+# Run against the bundled sample changelog
+releasemap ./node_modules/releasemap/examples/CHANGELOG.sample.md
+
+# Pipe through --stats to see the token-savings headline
+releasemap ./node_modules/releasemap/examples/CHANGELOG.sample.md --stats
+
+# Drill into a specific version
+releasemap ./node_modules/releasemap/examples/CHANGELOG.sample.md --version 3.0.0
+```
+
+---
+
 ## Source detection
 
 | Input | Source used |
