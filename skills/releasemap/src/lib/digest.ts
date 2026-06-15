@@ -177,6 +177,17 @@ export async function getReleaseMap(
 
   // Apply --since filter
   if (opts.since) {
+    // Validate that since looks like a semver before filtering; if it doesn't
+    // parse to at least major.minor.patch we skip the filter rather than
+    // silently returning an empty list.
+    const sinceClean = opts.since.replace(/^v/, "");
+    const sinceValid = /^\d+(\.\d+){0,2}(-[\w.]+)?$/.test(sinceClean);
+    if (!sinceValid) {
+      throw new Error(
+        `--since value does not look like a semver: "${opts.since}". ` +
+          `Expected a version like "1.2.0" or "v2.0.0".`
+      );
+    }
     releases = releases.filter((r) => semverGte(r.version, opts.since!));
   }
 
