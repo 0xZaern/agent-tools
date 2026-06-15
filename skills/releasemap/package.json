@@ -1,0 +1,51 @@
+{
+  "name": "releasemap",
+  "version": "1.0.0",
+  "description": "Token-efficient changelog and release-notes digest for AI agents — parses CHANGELOG.md, GitHub Releases, or npm registry history and returns a compact version timeline with breaking-change flags, counts, and drill-down at a fraction of raw changelog token cost",
+  "private": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "bin": {
+    "releasemap": "dist/cli.js"
+  },
+  "files": [
+    "dist/lib",
+    "dist/cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.lib.json",
+    "typecheck": "tsc -p tsconfig.lib.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "llm",
+    "mcp",
+    "changelog",
+    "releases",
+    "semver",
+    "github",
+    "npm",
+    "context",
+    "developer-tools"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.3"
+  }
+}
