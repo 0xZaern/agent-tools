@@ -119,8 +119,15 @@ async function main(): Promise<void> {
   }
   const framework = frameworkRaw as TestFramework;
 
-  const functionName =
+  const functionNameRaw =
     typeof values["function"] === "string" ? values["function"] : undefined;
+  if (functionNameRaw !== undefined && functionNameRaw.trim() === "") {
+    process.stderr.write(
+      `Error: --function value must not be empty. Pass a function name or omit the flag.\n`
+    );
+    process.exit(1);
+  }
+  const functionName = functionNameRaw?.trim();
 
   const opts: TestGenOptions = { format, maxTokens, framework, functionName };
 
