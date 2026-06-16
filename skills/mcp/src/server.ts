@@ -18,6 +18,10 @@ import { getAuditDigest, formatJson as auditJson, formatMarkdown as auditMd, for
 import { getSecretScanDigest, formatJson as secretJson, formatMarkdown as secretMd, formatText as secretText } from "secretscan";
 import { getSchemaDigest, formatJson as schemaJson, formatMarkdown as schemaMd, formatText as schemaText } from "schemadiff";
 import { getLogDigest, formatJson as logJson, formatMarkdown as logMd, formatText as logText } from "logfold";
+import { getDiffDigest, formatJson as diffJson, formatMarkdown as diffMd, formatText as diffText } from "diffdigest";
+import { getDepGraph, formatJson as depJson, formatMarkdown as depMd, formatText as depText } from "depgraph";
+import { getReleaseMap, formatJson as releaseJson, formatMarkdown as releaseMd, formatText as releaseText } from "releasemap";
+import { getTestGen, formatJson as testJson, formatMarkdown as testMd, formatText as testText } from "testgen";
 
 // ---------------------------------------------------------------------------
 // Server setup
@@ -380,6 +384,232 @@ server.tool(
         break;
       default:
         output = logJson(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: diffdigest
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "diffdigest",
+  "Produce a token-efficient digest of a git diff or GitHub PR. Accepts a local diff file, a GitHub PR URL, or piped unified diff text. Returns a structured change summary: total files, insertions/deletions, per-file change type, hunk counts, net lines, changed symbol names (TS/JS), and risk signals (missing tests, schema files touched, auth/secret patterns) — at a fraction of raw diff token cost.",
+  {
+    source: z
+      .string()
+      .optional()
+      .describe("Path to a .diff/.patch file or a GitHub PR URL (https://github.com/owner/repo/pull/N). Omit to read from stdin."),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (default, compact), md (markdown), text (plain)"),
+    maxTokens: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Soft token budget — trims the digest to approximately this many tokens"),
+    file: z
+      .string()
+      .optional()
+      .describe("Drill into a specific file path within the diff"),
+    token: z
+      .string()
+      .optional()
+      .describe("GitHub personal access token for private repos or higher rate limits"),
+  },
+  async (args) => {
+    const { source = null, format = "json", maxTokens, file, token } = args;
+
+    const digest = await getDiffDigest(source, { format, maxTokens, file, token });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = diffMd(digest);
+        break;
+      case "text":
+        output = diffText(digest);
+        break;
+      default:
+        output = diffJson(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: depgraph
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "depgraph",
+  "Produce a token-efficient import/export graph digest of a local TypeScript/JavaScript project. Walks the directory, uses the TypeScript compiler API to build an adjacency list of import edges, detects circular dependencies via DFS, identifies entry points and the most-imported files — at a fraction of the raw file-read token cost.",
+  {
+    path: z
+      .string()
+      .optional()
+      .describe("Absolute or relative path to the project root directory. Defaults to current working directory."),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (default, compact), md (markdown), text (plain)"),
+    maxTokens: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Soft token budget — trims the digest to approximately this many tokens"),
+    file: z
+      .string()
+      .optional()
+      .describe("Drill into a specific file — show its full import/export list"),
+    maxDepth: z
+      .number()
+      .int()
+      .nonnegative()
+      .optional()
+      .describe("Maximum directory traversal depth"),
+  },
+  async (args) => {
+    const { path: rootPath = ".", format = "json", maxTokens, file, maxDepth } = args;
+
+    const digest = await getDepGraph(rootPath, { format, maxTokens, file, maxDepth });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = depMd(digest);
+        break;
+      case "text":
+        output = depText(digest);
+        break;
+      default:
+        output = depJson(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: releasemap
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "releasemap",
+  "Produce a token-efficient changelog and release-notes digest. Accepts a local CHANGELOG.md file path, a GitHub owner/repo slug (reads GitHub Releases API), or an npm package name (reads npm registry). Returns a compact version timeline with breaking-change flags, added/changed/fixed/removed counts, and one-line summaries. Use --version for full notes of a specific release.",
+  {
+    target: z
+      .string()
+      .describe("A local CHANGELOG.md file path, GitHub owner/repo slug, or npm package name"),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (default, compact), md (markdown), text (plain)"),
+    maxTokens: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Soft token budget — trims the digest to approximately this many tokens"),
+    since: z
+      .string()
+      .optional()
+      .describe("Show only releases at or after this semver, e.g. '1.2.0'"),
+    version: z
+      .string()
+      .optional()
+      .describe("Drill into a single release version — returns full release notes"),
+    limit: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Maximum number of releases to return"),
+    token: z
+      .string()
+      .optional()
+      .describe("GitHub personal access token for higher rate limits"),
+  },
+  async (args) => {
+    const { target, format = "json", maxTokens, since, version, limit, token } = args;
+
+    const digest = await getReleaseMap(target, { format, maxTokens, since, version, limit, token });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = releaseMd(digest);
+        break;
+      case "text":
+        output = releaseText(digest);
+        break;
+      default:
+        output = releaseJson(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: testgen
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "testgen",
+  "Generate an edge-case test skeleton for a TypeScript/JavaScript source file. Reads exported function signatures via the TypeScript compiler API and emits test stubs covering null, undefined, empty, boundary, type-mismatch, and happy-path cases for vitest or jest — so an agent fills in expected values rather than writing the entire test structure.",
+  {
+    source: z
+      .string()
+      .describe("Absolute or relative path to a TypeScript or JavaScript source file"),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (default, compact), md (markdown), text (ready-to-paste test file)"),
+    maxTokens: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Soft token budget — trims the digest to approximately this many tokens"),
+    framework: z
+      .enum(["vitest", "jest"])
+      .optional()
+      .describe("Test framework to target: vitest (default) or jest"),
+    functionName: z
+      .string()
+      .optional()
+      .describe("Drill into a single function by name"),
+  },
+  async (args) => {
+    const { source, format = "json", maxTokens, framework = "vitest", functionName } = args;
+
+    const digest = await getTestGen(source, { format, maxTokens, framework, functionName });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = testMd(digest);
+        break;
+      case "text":
+        output = testText(digest);
+        break;
+      default:
+        output = testJson(digest);
     }
 
     return {

@@ -14,9 +14,16 @@ import { FunctionParam, FunctionSignature } from "./types.js";
 // Type printing
 // ---------------------------------------------------------------------------
 
+const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+
 function typeToString(type: ts.TypeNode | undefined): string {
   if (!type) return "unknown";
-  return type.getText();
+  try {
+    // createPrinter works without needing a source file context
+    return printer.printNode(ts.EmitHint.Unspecified, type, type.getSourceFile());
+  } catch {
+    return "unknown";
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -24,13 +31,29 @@ function typeToString(type: ts.TypeNode | undefined): string {
 // ---------------------------------------------------------------------------
 
 function extractParam(param: ts.ParameterDeclaration): FunctionParam {
-  const name = ts.isIdentifier(param.name)
-    ? param.name.text
-    : param.name.getText();
+  let name: string;
+  if (ts.isIdentifier(param.name)) {
+    name = param.name.text;
+  } else if (ts.isObjectBindingPattern(param.name) || ts.isArrayBindingPattern(param.name)) {
+    name = "args";
+  } else {
+    name = "param";
+  }
 
   const type = typeToString(param.type);
   const optional = !!param.questionToken || !!param.initializer;
-  const defaultValue = param.initializer?.getText();
+  let defaultValue: string | undefined;
+  if (param.initializer) {
+    try {
+      defaultValue = printer.printNode(
+        ts.EmitHint.Unspecified,
+        param.initializer,
+        param.initializer.getSourceFile()
+      );
+    } catch {
+      defaultValue = undefined;
+    }
+  }
 
   return { name, type, optional, defaultValue };
 }

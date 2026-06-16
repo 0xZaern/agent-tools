@@ -206,10 +206,122 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+  build-diffdigest:
+    name: Build diffdigest
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: skills/diffdigest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: skills/diffdigest/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build library + CLI
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  build-depgraph:
+    name: Build depgraph
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: skills/depgraph
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: skills/depgraph/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build library + CLI
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  build-releasemap:
+    name: Build releasemap
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: skills/releasemap
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: skills/releasemap/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build library + CLI
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  build-testgen:
+    name: Build testgen
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: skills/testgen
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: skills/testgen/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build library + CLI
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
   build-mcp:
     name: Build MCP server
     runs-on: ubuntu-latest
-    needs: [build-devpulse, build-codemap, build-apiscout, build-auditsnap, build-secretscan, build-schemadiff, build-logfold]
+    needs: [build-devpulse, build-codemap, build-apiscout, build-auditsnap, build-secretscan, build-schemadiff, build-logfold, build-diffdigest, build-depgraph, build-releasemap, build-testgen]
 
     steps:
       - name: Checkout
@@ -246,6 +358,22 @@ jobs:
 
       - name: Build logfold (dependency)
         working-directory: skills/logfold
+        run: npm install && npm run build
+
+      - name: Build diffdigest (dependency)
+        working-directory: skills/diffdigest
+        run: npm install && npm run build
+
+      - name: Build depgraph (dependency)
+        working-directory: skills/depgraph
+        run: npm install && npm run build
+
+      - name: Build releasemap (dependency)
+        working-directory: skills/releasemap
+        run: npm install && npm run build
+
+      - name: Build testgen (dependency)
+        working-directory: skills/testgen
         run: npm install && npm run build
 
       - name: Install MCP server dependencies

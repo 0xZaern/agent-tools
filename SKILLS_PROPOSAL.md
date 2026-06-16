@@ -262,11 +262,11 @@ Next.js CHANGELOG.md: ≈ 180,000 tokens raw → digest ≈ 2,500 tokens = **98.
 |------|-------|-------|--------|-------|--------|
 | 1 | **apiscout** | Very High | Low | 5/5 | shipped |
 | 2 | **auditsnap** | High | Low | 4.5/5 | shipped |
-| 3 | **diffdigest** | High | Low-Med | 4/5 | — |
-| 4 | **releasemap** | High | Low | 4/5 | — |
+| 3 | **diffdigest** | High | Low-Med | 4/5 | shipped |
+| 4 | **releasemap** | High | Low | 4/5 | shipped |
 | 5 | **schemamap** → **schemadiff** | High | Med | 3.5/5 | shipped |
 | 6 | **errorlens** → **logfold** | Med-High | Med | 3/5 | shipped |
-| 7 | **depgraph** | Med | Med | 2.5/5 | — |
+| 7 | **depgraph** | Med | Med | 2.5/5 | shipped |
 
 ### Scoring rationale
 
@@ -290,7 +290,7 @@ Next.js CHANGELOG.md: ≈ 180,000 tokens raw → digest ≈ 2,500 tokens = **98.
 
 ### Status
 
-`apiscout`, `auditsnap`, `schemadiff`, and `logfold` are all built and shipped. See `skills/schemadiff/` and `skills/logfold/` for implementation details. The remaining candidates (`diffdigest`, `releasemap`, `depgraph`) are unbuilt.
+`apiscout`, `auditsnap`, `schemadiff`, `logfold`, `diffdigest`, `depgraph`, `releasemap`, and `testgen` are all built and shipped. See the respective `skills/<name>/` directories for implementation details.
 
 ---
 
