@@ -182,6 +182,40 @@ interface FunctionSignature {
 
 ---
 
+## vitest vs jest output differences
+
+The `--framework` flag controls two things:
+
+1. **Import line** — vitest stubs import from `'vitest'`; jest stubs omit the import (jest globals are injected automatically by the test runner).
+2. **Async assertions** — async functions get a `resolves.toBeDefined()` chain for vitest; jest output uses the same shape since jest 27+ also supports it.
+
+| Feature | `--framework vitest` | `--framework jest` |
+|---------|---------------------|--------------------|
+| Import line | `import { describe, it, expect } from 'vitest'` | _(none — jest injects globals)_ |
+| Async happy-path | `await expect(fn()).resolves.toBeDefined()` | `await expect(fn()).resolves.toBeDefined()` |
+| Error stubs | `expect(() => fn(null)).toThrow()` | `expect(() => fn(null)).toThrow()` |
+
+Both frameworks use the same assertion API for the generated cases, so switching between them requires only changing the import line in the output file.
+
+---
+
+## Example fixtures
+
+The [`examples/`](./examples/) directory contains a ready-made TypeScript input file you can use to try the CLI locally:
+
+```sh
+# JSON digest (default)
+testgen ./node_modules/testgen/examples/math.ts
+
+# Ready-to-paste vitest file
+testgen ./node_modules/testgen/examples/math.ts --text > math.test.ts
+
+# Single function drill-down
+testgen ./node_modules/testgen/examples/math.ts --function clamp --md
+```
+
+---
+
 ## What gets included
 
 - Exported named functions (`export function foo(...)`)
