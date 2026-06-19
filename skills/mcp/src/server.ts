@@ -22,6 +22,7 @@ import { getDiffDigest, formatJson as diffJson, formatMarkdown as diffMd, format
 import { getDepGraph, formatJson as depJson, formatMarkdown as depMd, formatText as depText } from "depgraph";
 import { getReleaseMap, formatJson as releaseJson, formatMarkdown as releaseMd, formatText as releaseText } from "releasemap";
 import { getTestGen, formatJson as testJson, formatMarkdown as testMd, formatText as testText } from "testgen";
+import { getDeadCode, formatJson as deadJson, formatMarkdown as deadMd, formatText as deadText } from "deadcode";
 
 // ---------------------------------------------------------------------------
 // Server setup
@@ -610,6 +611,58 @@ server.tool(
         break;
       default:
         output = testJson(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: deadcode
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "deadcode",
+  "Scan a TypeScript/JavaScript project for dead exports — named functions, classes, types, constants, and enums that are declared but never imported by any other local file. Returns a compact ranked digest grouped by file with kind and line number, so an agent can pinpoint unused symbols without reading every source file.",
+  {
+    path: z
+      .string()
+      .optional()
+      .describe("Absolute or relative path to the project root directory. Defaults to current working directory."),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (compact), md (markdown), text (default, plain)"),
+    limit: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Maximum number of dead-export entries to return across all files"),
+    maxDepth: z
+      .number()
+      .int()
+      .nonnegative()
+      .optional()
+      .describe("Maximum directory traversal depth"),
+  },
+  async (args) => {
+    const { path: rootPath = ".", format = "text", limit, maxDepth } = args;
+
+    const digest = await getDeadCode(rootPath, { format, limit, maxDepth });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = deadMd(digest);
+        break;
+      case "json":
+        output = deadJson(digest);
+        break;
+      default:
+        output = deadText(digest);
     }
 
     return {
