@@ -18,12 +18,13 @@ A collection of small, focused skills that help AI agents and LLMs work with cod
 | [**depgraph**](./skills/depgraph) | Import/export graph — entry points, circular deps, heaviest subtrees | ~80% |
 | [**releasemap**](./skills/releasemap) | CHANGELOG.md / GitHub Releases / npm history — version timeline, breaking flags | ~98% |
 | [**testgen**](./skills/testgen) | TS/JS source file — edge-case test stubs (null, boundary, type-mismatch) for vitest or jest | ~76% |
+| [**deadcode**](./skills/deadcode) | TS/JS project — declared exports that are never imported anywhere, ranked by file with kind and line | ~99% |
 
 ---
 
 ## MCP Server
 
-[**skills/mcp**](./skills/mcp) is an MCP (Model Context Protocol) server that exposes all ten skills above as native MCP tools for MCP-compatible editors and AI workflows.
+[**skills/mcp**](./skills/mcp) is an MCP (Model Context Protocol) server that exposes all eleven skills above as native MCP tools for MCP-compatible editors and AI workflows.
 
 Register it once in your MCP client config and all tools become available without any extra shell commands:
 
