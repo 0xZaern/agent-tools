@@ -1,0 +1,51 @@
+{
+  "name": "covergap",
+  "version": "1.0.0",
+  "description": "Coverage-gap digest for AI agents - parses lcov.info or Istanbul/nyc/c8/vitest coverage-final.json and returns a compact ranked list of the highest-risk under-tested files",
+  "private": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "bin": {
+    "covergap": "dist/cli.js"
+  },
+  "files": [
+    "dist/lib",
+    "dist/cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.lib.json",
+    "typecheck": "tsc -p tsconfig.lib.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "llm",
+    "mcp",
+    "coverage",
+    "lcov",
+    "istanbul",
+    "nyc",
+    "c8",
+    "vitest",
+    "testing",
+    "developer-tools"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.3"
+  }
+}
