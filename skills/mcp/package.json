@@ -1,7 +1,7 @@
 {
   "name": "agent-skills-mcp",
   "version": "1.0.0",
-  "description": "MCP server exposing agent-skills (devpulse, codemap, apiscout, auditsnap, secretscan, schemadiff, logfold, diffdigest, depgraph, releasemap, testgen, deadcode) as native tools for MCP-compatible editors and AI workflows",
+  "description": "MCP server exposing agent-skills (devpulse, codemap, apiscout, auditsnap, secretscan, schemadiff, logfold, diffdigest, depgraph, releasemap, testgen, deadcode, covergap) as native tools for MCP-compatible editors and AI workflows",
   "private": false,
   "license": "MIT",
   "engines": {
@@ -44,7 +44,8 @@
     "depgraph": "file:../depgraph",
     "releasemap": "file:../releasemap",
     "testgen": "file:../testgen",
-    "deadcode": "file:../deadcode"
+    "deadcode": "file:../deadcode",
+    "covergap": "file:../covergap"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

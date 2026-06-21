@@ -23,6 +23,7 @@ import { getDepGraph, formatJson as depJson, formatMarkdown as depMd, formatText
 import { getReleaseMap, formatJson as releaseJson, formatMarkdown as releaseMd, formatText as releaseText } from "releasemap";
 import { getTestGen, formatJson as testJson, formatMarkdown as testMd, formatText as testText } from "testgen";
 import { getDeadCode, formatJson as deadJson, formatMarkdown as deadMd, formatText as deadText } from "deadcode";
+import { getCoverGap, formatJson as coverJson, formatMarkdown as coverMd, formatText as coverText } from "covergap";
 
 // ---------------------------------------------------------------------------
 // Server setup
@@ -663,6 +664,60 @@ server.tool(
         break;
       default:
         output = deadText(digest);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: output }],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: covergap
+// ---------------------------------------------------------------------------
+
+server.tool(
+  "covergap",
+  "Produce a token-efficient coverage-gap digest from a test coverage report. Accepts an lcov.info or coverage-final.json file (Istanbul/nyc/c8/vitest) and returns a compact ranked list of the highest-risk under-tested files — scored by combining coverage gap percentage with absolute uncovered line count — so an agent knows exactly which files to write tests for first.",
+  {
+    source: z
+      .string()
+      .describe(
+        "Path to a coverage file: lcov.info or coverage-final.json. Format is auto-detected from extension and content."
+      ),
+    format: z
+      .enum(["json", "md", "text"])
+      .optional()
+      .describe("Output format: json (compact), md (markdown table), text (default, plain)"),
+    limit: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe("Maximum number of files to return — returns the top N highest-risk files"),
+    minRisk: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .optional()
+      .describe("Omit files with a risk score below this threshold (0–100, default: 0)"),
+  },
+  async (args) => {
+    const { source, format = "text", limit, minRisk } = args;
+
+    const digest = await getCoverGap(source, { format, limit, minRisk });
+
+    let output: string;
+    switch (format) {
+      case "md":
+        output = coverMd(digest);
+        break;
+      case "json":
+        output = coverJson(digest);
+        break;
+      default:
+        output = coverText(digest);
     }
 
     return {
